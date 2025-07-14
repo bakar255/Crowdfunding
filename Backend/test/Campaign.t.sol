@@ -34,10 +34,22 @@ contract CampaignFundsTest is Test {
 
     }
 
-    function testContribution() public {
-     vm.prank(donor);
-     campaignFunds.applyContribution{value: 0.5 ether}(0);
-    }
+  function testApplyContribution() public {
+   // Create Campaign
+   vm.prank(owner);
+   campaignFunds.createCampaign("Raising for kids with cancers");
+    // Contribute to campaign
+   vm.prank(donor);
+   vm.deal(donor, 5 ether);
+   campaignFunds.applyContribution{value: 3 ether}(0);
+
+   // Verify assert 
+   CampaignFunds.Campaign memory camp = campaignFunds.showCampaign(0);
+   assertEq(address(campaignFunds).balance, 3 ether);
+   assertEq(camp.balance, 3 ether);
+   assertEq(camp.creator, camp.creator);
+}
+    
 
 
 }
