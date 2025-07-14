@@ -35,7 +35,7 @@ contract CampaignFunds {
         uint256 amount;
     }
 
-    function CreateCampaign(string memory _goal) external {
+    function createCampaign(string memory _goal) external returns (uint256){
 
         uint256 Id = nextOrderId++;
         campaigns[Id] = (Campaign({
@@ -45,12 +45,14 @@ contract CampaignFunds {
             isActive: true
         }));
         emit CampaignCreated(Id, _goal);
+        return Id;
     }
 
     function applyContribution(uint _Id) external payable{
         require(msg.value > 0, "You must send a positive amount");
         require(campaigns[_Id].isActive, "Campaign no longer Active");
-     
+        require(campaigns[_Id].creator != address(0), "Campaign does not exist");
+
         campaigns[_Id].balance += msg.value;
         emit ContributionReceived(_Id, msg.sender, msg.value);
     }
@@ -60,7 +62,7 @@ contract CampaignFunds {
         campaigns[_Id].isActive = false;
     }
 
-    function seeCampaign(uint _Id) public view returns (Campaign memory) {
+    function showCampaign(uint _Id) public view returns (Campaign memory) {
         return campaigns[_Id];
     }
 
