@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 5, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/bax/Desktop/Web3%20Dev/Crowdfunding/Frontend/my-app/src/pages/index.tsx"],"sourcesContent":["import Image from \"next/image\";\nimport {  getContract } from '../utils/contract'; \nimport { Geist, Geist_Mono } from \"next/font/google\";\nimport CampaignApp from \"./CampaignApp\";\n\n\n\nexport default function Home() {\n\n  return (\n    <div className=\" min-w-lg bg-[#15161a] \">\n      <main className=\"flex flex-col gap-[32px] row-start-2 items-center sm:items-start\">\n       \n        <button onClick={createCampaing}>CreateCampaing</button>\n      </main>\n      <footer className=\"row-start-3 flex gap-[24px] flex-wrap items-center justify-center\">\n        \n      </footer>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAOe,SAAS;IAEtB,qBACE,qKAAC;QAAI,WAAU;;0BACb,qKAAC;gBAAK,WAAU;0BAEd,cAAA,qKAAC;oBAAO,SAAS;8BAAgB;;;;;;;;;;;0BAEnC,qKAAC;gBAAO,WAAU;;;;;;;;;;;;AAKxB","debugId":null}}]
+}
