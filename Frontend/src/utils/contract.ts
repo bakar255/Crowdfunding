@@ -12,8 +12,8 @@ export const getContract = async () => {
   const signer = provider.getSigner();
   
   return new ethers.Contract(
-    CONTRACT_ADDRESS,
-    YourContractABI,
+    contractAddress,
+    contractABI,
     signer
   );
 };
