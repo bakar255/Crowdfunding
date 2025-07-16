@@ -1,10 +1,5 @@
-import Image from "next/image";
-import {  getContract } from '../utils/contract'; 
-import { Geist, Geist_Mono } from "next/font/google";
-import  { createCampaign } from "../utils/CampaignApp";
+import  { createCampaign } from "@utils/Campaign";
 import { ethers } from "ethers";
-
-
 
 export default function Home() {
 
@@ -15,7 +10,7 @@ export default function Home() {
       <main className="flex flex-col ">
          <div className="">
                 <button className="bg-amber-500"></button>
-                <createCampaign/>
+                {createCampaign()}
          </div>
       </main>
       <footer className=" justify-center">
