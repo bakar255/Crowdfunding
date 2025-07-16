@@ -32,7 +32,32 @@ export default function CampaignApp() {
             console.error("Error to endCampaign and fetch details", error);
         }
 
-    } 
+    }
+    
+     const contribute = async (campaignId: number, amount: number, 
+        callbacks: {
+         Success?: (txHash: string) => void;
+         Error?: (error:Error) => void;
+         PendingTx?: () => void;
+        }
+         ) => {
+            try {
+
+        callbacks.PendingTx?.();
+
+        const contract = await getContract();
+
+        const tx = await contract.applyContribution(campaignId,
+       {amount: ethers.parseEther(amount.toString())} );
+
+       await tx.wait();
+
+        callbacks.Success?.{tx.hash};
+
+        } catch (error) {
+            callbacks.Error?.(new Error('Error'));
+        };
+    
 
      const getCampaignById = async (campaignId: number) => {
         const contract = await getContract(); // new ethers.contract(address, abi, provider)
@@ -69,4 +94,6 @@ export default function CampaignApp() {
             </button>
         </div>
     );
+}
+
 }
