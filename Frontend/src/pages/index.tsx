@@ -1,24 +1,24 @@
 import Image from "next/image";
 import {  getContract } from '../utils/contract'; 
 import { Geist, Geist_Mono } from "next/font/google";
-import CampaignApp from "../utils/CampaignApp";
+import  { createCampaign } from "../utils/CampaignApp";
 import { ethers } from "ethers";
-import { CampaignList } from "./MainCampaign"
 
 
 
 export default function Home() {
 
+
   return (
-    <div className="bg-[#15161a] ">
+    <div className="">
+      <p className="text-white-500">TEXT WHITE</p>
       <main className="flex flex-col ">
-       <CampaignApp />
          <div className="">
+                <button className="bg-amber-500"></button>
+                <createCampaign/>
          </div>
       </main>
       <footer className=" justify-center">
-        <CampaignList/>
-
       </footer>
     </div>
   );
