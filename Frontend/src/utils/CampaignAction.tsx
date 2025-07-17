@@ -68,15 +68,24 @@ export const createCampaign = async (goal: string, durationDays: number) => {
     }
 
 
-     const getCampaignById = async (campaignId: number) => {
-        const contract = await getContract(); // new ethers.contract(address, abi, provider)
+export const getCampaignById = async (campaignId) => {
+    const contract = await getContract();
+    
+    try {
+        const id = BigInt(campaignId); 
         
-        const campaign = await contract.showCampaign(campaignId)
+        const campaign = await contract.showCampaign(id);
+        console.log("Campaign Data from Contract:", campaign);
+
         return {  
             goal: ethers.formatEther(campaign.goal),
             creator: campaign.creator,
             balance: ethers.formatEther(campaign.balance),
             isActive: campaign.isActive,
             deadline: campaign.duration,
-        }
+        };
+    } catch (error) {
+        console.error("Error fetching campaign:", error);
+        throw new Error("ID invalide ou erreur du contrat.");
     }
+};

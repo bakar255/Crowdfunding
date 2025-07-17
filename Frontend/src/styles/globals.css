@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: hsl(0, 0%, 89%);
-  --foreground: #040404;
+  --background: hsl(0, 4%, 5%);
+  --foreground: #ffffff;
 }
 
 
@@ -12,3 +12,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.dashboard{
+  height: 15rem;
+  width: 29rem;
+  border-radius: 0.25rem;
+  text-align: center;
+  background-color: #1a1717;
+}
+
