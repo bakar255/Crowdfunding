@@ -40,7 +40,7 @@ export const createCampaign = async (goal: string, durationDays: number) => {
 
     }
     
-     const contribute = async (campaignId: number, amount: number, 
+     export const contribute = async (campaignId: number, amount: number, 
         callbacks: {
          Success?: (txHash: string) => void;
          Error?: (error:Error) => void;

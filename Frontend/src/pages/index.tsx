@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getContract } from "@/utils/contract";
-import { createCampaign, getCampaignById } from '@utils/CampaignAction';
+import { createCampaign, getCampaignById, contribute } from '@utils/CampaignAction';
 import { ethers } from "ethers";
 
 interface Campaign {
@@ -15,13 +15,16 @@ interface Campaign {
   deadline: Date;
 }
 
-export default function Home() {
+export default function Home() {  
+  const [popUp, setPopUp ] = useState(false);
   const [days, setDays] = useState<number>(1);
   const [goal, setGoal] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [campaignId, setCampaignId] = useState<string>("");
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [error, setError] = useState<string>("");
+  const [amount, setAmount] = useState<number>();
+  const [success, setSuccess] = useState('');
 
   const handleCreateCampaign = async () => {
     if (!goal) {
@@ -40,6 +43,7 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -119,7 +123,7 @@ export default function Home() {
             )}
 
             {campaign && (
-                <div className="border rounded-lg p-4 bg-white shadow">
+                <div className="border rounded-lg p-4 bg-white shadow mt-10">
           <h3 className="text-xl font-bold mb-3">Campaign Details</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -144,7 +148,7 @@ export default function Home() {
             </div>
             <div>
               <p className="font-semibold">Status:</p>
-              <p>{campaign.isActive ? 'Active' : 'Ended'}</p>
+              <p>{campaign.isActive ? 'Active 🟢' : 'Ended 🔴'}</p>
             </div>
             <div className="col-span-2">
               <p className="font-semibold">Deadline:</p>
@@ -194,6 +198,33 @@ export default function Home() {
             </div>
           </section>
         </div>
+        <section>
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 ">
+               <div className="bg-white rounded-lg p-6">
+                <div className=" justify-center items-center flex mb-6">
+                <h2 className="text-2xl">Campaign #1</h2>
+                </div>
+             <div className="justify-center flex mb-4">
+              <span className="font-bold text-gray-600 text-2xl">Goal </span>            
+                </div>
+                  <div className="flex justify-center">
+                     <span className="font-semibold">Help People in the world ! </span>
+
+                  </div>
+                  <div className="h-64 mt-10">
+                    <div className="h-64 mt-4 mb-4 bg-gray-100 rounded-lg overflow-hidden ">
+                      <img src="" alt="" className="object-cover w-full h-full" />
+                    </div>
+                  </div>
+                  <div className="flex justify-center mt-3">
+                  <button className="bg-[#0f8922] p-3 cursor-pointer rounded-lg">Contribute</button>
+                  <label htmlFor="">
+                  <select name="" id="" value={amount} onChange={(e) => setAmount(Number(e.target.value))}></select>  
+                  </label> 
+                  </div>
+                </div>
+           </div>
+           </section>
       </main>
 
       <footer className="bg-gray-800 p-4 text-center text-gray-400">
