@@ -1,96 +1,205 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getContract } from "@/utils/contract";
-import  CampaignApp  from "@utils/Campaign";
-import { createCampaign, getCampaignById } from '@utils/CampaignAction'
-import { dataLength, ethers } from "ethers";
-import { addListener } from "process";
+import { createCampaign, getCampaignById } from '@utils/CampaignAction';
+import { ethers } from "ethers";
+
+interface Campaign {
+  id: bigint | string;
+  goal: bigint;
+  duration: bigint | number;
+  creator: string;
+  balance: string;
+  isActive: boolean;
+  deadline: Date;
+}
 
 export default function Home() {
-
-  const [popUp, setPopUp] = useState(false);
   const [days, setDays] = useState<number>(1);
-  const [goal, setGoal] = useState("")
-  const [campaignId, setCampaignId] = useState("");
+  const [goal, setGoal] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [campaignId, setCampaignId] = useState<string>("");
+  const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [error, setError] = useState<string>("");
 
-  const handleCampaign = async () => {
+  const handleCreateCampaign = async () => {
+    if (!goal) {
+      setError("Please enter a goal");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const txHash = await createCampaign(goal, days); 
+      console.log("Transaction hash:", txHash);
+      setError("");
+    } catch (error) {
+      setError(`Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!campaignId.trim()) {
+    setError("Please enter a valid campaign ID");
+    return;
+  }
+
+  setIsLoading(true);
+  setError("");
+  setCampaign(null);
+
   try {
-    const txHash = await createCampaign(goal, days ); // "100" au lieu de 100
-    console.log("Transaction hash:", txHash);
-  } catch (error) {
-    alert(`Erreur: ${error.message}`);
+    const campaignData = await getCampaignById(campaignId);
+    
+    setCampaign({
+      id: campaignId,  
+      goal: campaignData.goal,
+      creator: campaignData.creator,
+      balance: campaignData.balance,
+      isActive: campaignData.isActive,
+      deadline: campaignData.deadline,
+      duration: campaignData.duration
+    });
+
+  } catch (error: any) {
+    console.error("Campaign fetch error:", error);
+    setError(error.message || "Failed to fetch campaign details");
+  } finally {
+    setIsLoading(false);
   }
 };
 
- const handleFetchCampaign = async () => {
-    const id = campaignId.trim();
-    
-    if (!id || !/^\d+$/.test(id)) { 
-      alert("Veuillez entrer un ID valide (nombre entier positif).");
-      return;
-    }
-    try {
-      const campaignData = await getCampaignById(ethers.BigNumber.from(id)); // Solution recommandée
-      console.log("Campaign Data:", campaignData);
-    } catch (error) {
-      console.error("Error fetching campaign:", error);
-      alert("Erreur : L'ID doit être un nombre valide ou la campagne n'existe pas.");
-    }
-};
-
-return (
-  <div className="min-h-screen flex flex-col">
-
-    <nav className="bg-gray-800 w-full p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="justify-between">
-          <span>Crowfunding</span>
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-900">
+      <header className="bg-gray-800 w-full p-4 shadow-md">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <h1 className="text-white text-xl font-bold">Crowdfunding Platform</h1>
         </div>
-        <ul className="flex justify-center space-x-4">
-        </ul>
-      </div>
-       </nav>
-    <main className="flex-grow flex items-center justify-center p-4">
-      <div className="rounded-lg bg-gray-600 p-6 max-w-4xl w-[min-h-120]">
-        <div className="flex flex-col justify-between items-center mb-4">
-      <span className="text-white text-xl font-semibold ">Dashboard</span>
-          <button 
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors"
-            onClick={() => setPopUp(true)}>
-            Create Campaign
-          </button>          
-             </div>
-          { popUp && (
-            <div className=" fixed z-50 inset-0 rounded-lg  backdrop-blur-xs flex justify-center items-center">
-              <div className="rounded-lg bg-[#0f0f0f] w-2/8 h-3/8 p-5 relative">
-               <div className="flex-col flex items-center">
-                <span className="text-white font-bold text-2xl"> Create Campaign</span>
-                  <div className="justify-between mt-5 flex">
-                    <span className="mx-5 mt-2 text-left">Goal</span>
-                    <input type="text" className="p-1 rounded-lg border-10" onChange={(e) => setGoal(e.target.value)} />
-                    </div>
-                    <div className="p-2 mt-2">
-                      <span>Days</span>
-                      <select name="" id="" onChange={(e) => setDays(Number(e.target.value))} className="rounded-lg mx-6 w-full">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                      </select>
-                    </div>
-                    <button className="bg-green-600 absolute bottom-5 block rounded-lg p-3" onClick={handleCampaign}>Create</button>
-                   <button onClick={() => setPopUp(false)} className="absolute right-0">x</button>
-                </div>
-               </div>
+      </header>
+      
+      <main className="flex-grow container mx-auto p-4 md:p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <section className="bg-gray-800 rounded-lg p-6 shadow-lg">
+            <h2 className="text-white text-xl font-semibold mb-4">Find Campaign</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="campaign-id" className="block text-gray-300 mb-2">
+                  Campaign ID:
+                </label>
+                <input
+                  id="campaign-id"
+                  type="text"
+                  value={campaignId}
+                  onChange={(e) => setCampaignId(e.target.value)}
+                  placeholder="Enter campaign ID"
+                  className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+                />
               </div>
-          )};
-       </div>
-      </div>
-    </main>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-2 px-4 rounded font-medium ${isLoading 
+                  ? 'bg-gray-600 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                {isLoading ? "Loading..." : "View Campaign"}
+              </button>
+            </form>
 
-    <footer className="">
-    </footer>
-  </div>
-);
+            {error && (
+              <div className="mt-4 p-2 bg-red-900 text-red-200 rounded">
+                {error}
+              </div>
+            )}
 
+            {campaign && (
+                <div className="border rounded-lg p-4 bg-white shadow">
+          <h3 className="text-xl font-bold mb-3">Campaign Details</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="font-semibold">ID:</p>
+              <p>{campaign.id.toString()}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Creator:</p>
+              <p className="truncate">{campaign.creator}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Goal:</p>
+              <p>{campaign.goal} ETH</p>
+            </div>
+            <div>
+              <p className="font-semibold">Duration:</p>
+              <p>{Number(campaign.duration)} seconds</p>
+            </div>
+            <div>
+              <p className="font-semibold">Balance:</p>
+              <p>{campaign.balance} ETH</p>
+            </div>
+            <div>
+              <p className="font-semibold">Status:</p>
+              <p>{campaign.isActive ? 'Active' : 'Ended'}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="font-semibold">Deadline:</p>
+              <p>{campaign.deadline.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
+          </section>
+
+          <section className="bg-gray-800 rounded-lg p-6 shadow-lg">
+            <h2 className="text-white text-xl font-semibold mb-4">Create New Campaign</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-gray-300 mb-2">Funding Goal (ETH)</label>
+                <input 
+                  type="text" 
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)} 
+                  placeholder="Enter funding goal"
+                  className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-300 mb-2">Duration (days)</label>
+                <select 
+                  value={days}
+                  onChange={(e) => setDays(Number(e.target.value))} 
+                  className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+                >
+                  {[1, 2, 3].map(day => (
+                    <option key={day} value={day}>{day} day{day > 1 ? 's' : ''}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <button
+                onClick={handleCreateCampaign}
+                disabled={isLoading}
+                className={`w-full py-2 px-4 rounded font-medium ${isLoading 
+                  ? 'bg-gray-600 cursor-not-allowed' 
+                  : 'bg-green-600 hover:bg-green-700'}`}
+              >
+                {isLoading ? "Creating..." : "Create Campaign"}
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer className="bg-gray-800 p-4 text-center text-gray-400">
+        <p>Crowdfunding Platform</p>
+      </footer>
+    </div>
+  );
 }
+

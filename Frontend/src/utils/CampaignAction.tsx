@@ -69,23 +69,36 @@ export const createCampaign = async (goal: string, durationDays: number) => {
 
 
 export const getCampaignById = async (campaignId) => {
-    const contract = await getContract();
-    
-    try {
-        const id = BigInt(campaignId); 
-        
-        const campaign = await contract.showCampaign(id);
-        console.log("Campaign Data from Contract:", campaign);
-
-        return {  
-            goal: ethers.formatEther(campaign.goal),
-            creator: campaign.creator,
-            balance: ethers.formatEther(campaign.balance),
-            isActive: campaign.isActive,
-            deadline: campaign.duration,
-        };
-    } catch (error) {
-        console.error("Error fetching campaign:", error);
-        throw new Error("ID invalide ou erreur du contrat.");
+  const contract = await getContract();
+  
+  try {
+    const nextId = await contract.nextOrderId();
+    if (Number(campaignId) >= Number(nextId)) {
+      throw new Error("Campaign ID does not exist");
     }
+
+    const campaign = await contract['showCampaign(uint256)'](campaignId);
+
+    if (campaign.creator === ethers.ZeroAddress) {
+      throw new Error("Campaign data corrupted");
+    }
+
+    return {
+      goal: campaign.goal,
+      id: campaign.id,
+      duration: campaign.duration,
+      creator: campaign.creator,
+      balance: ethers.formatEther(campaign.balance.toString()),
+      isActive: campaign.isActive,
+      deadline: new Date(Number(campaign.deadlineDuration) * 1000),
+    };
+    
+  } catch (error) {
+    console.error("Debug details:", {
+      error,
+      contractAddress: contract.target,
+      network: await contract.provider.getNetwork()
+    });
+    throw new Error(error.reason || "Failed to fetch campaign");
+  }
 };
