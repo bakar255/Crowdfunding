@@ -1,33 +1,55 @@
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { getContract } from "./contract";
-import { useState } from "react";
-import { create } from "domain";
 
-export default function CampaignApp() {
+export default function CampaignList() {
+    const [campaigns, setCampaigns] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const [campaignGoal, setCampaignGoal] = useState("");
+    useEffect(() => {
+        const fetchCampaigns = async () => {
+            try {
+                const contract = await getContract();
+                const count = contract.nextOrderId(); 
+                
+                const campaignPromises = [];
+                for (let i = 0; i < count; i++) {
+                    campaignPromises.push(contract.showCampaign(i));
+                }
 
-        const CampaignAll = async () => {
-        const contract = await getContract();
-        const count = await contract.campaignCount();
-        const campaigns = [];
+                const rawCampaigns = await Promise.all(campaignPromises);
+                
+                const formattedCampaigns = rawCampaigns.map((campaign, index) => ({
+                    id: index,
+                    goal: campaign.goal,
+                    creator: campaign.creator,
+                    balance: ethers.formatEther(campaign.balance),
+                    isActive: campaign.isActive,
+                    deadline: new Date(Number(campaign.deadlineDuration) * 1000),
+                    formattedBalance: ethers.formatEther(campaign.balance)
+                }));
 
-        for (let i = 0; i < count; i++) {
-            campaigns.push(await contract.campaigns(i));
-        }
+                setCampaigns(formattedCampaigns);
+            } catch (err) {
+                console.error("Failed to fetch campaigns:", err);
+                setError("Failed to load campaigns");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        return campaigns;
-    }
+        fetchCampaigns();
+    }, []);
 
     return (
-        <div className="h-45 flex items-center justify-center bg-gray-900">
-            <button 
-                className="p-10 bg-amber-400">
-            </button>
-            <button>
-
-            </button>
+        <div className="max-w-4xl mx-auto py-8">
+            <h2 className="text-2xl font-bold text-white mb-6">All Campaigns</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {campaigns.map((campaign) => (
+                ))}
+            </div>
         </div>
     );
 }
-

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getContract } from "@/utils/contract";
 import { createCampaign, getCampaignById, contribute } from '@utils/CampaignAction';
 import { ethers } from "ethers";
+import { CampaignList } from "@utils/Campaign"
 
 interface Campaign {
   id: bigint | string;
@@ -25,6 +26,8 @@ export default function Home() {
   const [error, setError] = useState<string>("");
   const [amount, setAmount] = useState<number>();
   const [success, setSuccess] = useState('');
+  const [allCampaigns, setAllCampaigns] = useState([]);
+
 
   const handleCreateCampaign = async () => {
     if (!goal) {
@@ -43,8 +46,6 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-
-
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -209,17 +210,21 @@ export default function Home() {
                 </div>
                   <div className="flex justify-center">
                      <span className="font-semibold">Help People in the world ! </span>
-
+               <CampaignList />
                   </div>
                   <div className="h-64 mt-10">
                     <div className="h-64 mt-4 mb-4 bg-gray-100 rounded-lg overflow-hidden ">
                       <img src="" alt="" className="object-cover w-full h-full" />
                     </div>
                   </div>
-                  <div className="flex justify-center mt-3">
-                  <button className="bg-[#0f8922] p-3 cursor-pointer rounded-lg">Contribute</button>
-                  <label htmlFor="">
-                  <select name="" id="" value={amount} onChange={(e) => setAmount(Number(e.target.value))}></select>  
+                  <div className="flex justify-center mt-3 flex-box items-center space-x-6">
+                  <button className="bg-[#0f8922] p-3 cursor-pointer rounded-lg w-35">Contribute</button>
+                  <label htmlFor="" className="bloc w-1/4  text-white p-6 ">
+                  <select name="amount" className="w-full py-3 p-5 rounded-lg" id="" value={amount} onChange={(e) => setAmount(Number(e.target.value))}>
+                   <option value="amount">0.1 ETH</option>  
+                   <option value="amount">0.5 ETH</option>
+                   <option value="amount">1 ETH</option>  
+                  </select>  
                   </label> 
                   </div>
                 </div>
