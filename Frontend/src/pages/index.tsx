@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { getContract } from "@/utils/contract";
 import { createCampaign, getCampaignById, contribute } from '@utils/CampaignAction';
 import { ethers } from "ethers";
-import { CampaignList } from "@utils/Campaign"
+import  CampaignList  from "@utils/Campaign";
 
 interface Campaign {
   id: bigint | string;
@@ -85,10 +85,17 @@ export default function Home() {
       <header className="bg-gray-800 w-full p-4 shadow-md">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <h1 className="text-white text-xl font-bold">Crowdfunding Platform</h1>
+          <div className="space-x-7">
+          <button className="button-navbar ">DashBoard</button>
+          <button className="button-navbar">Campaigns</button>
+          </div>
         </div>
       </header>
       
       <main className="flex-grow container mx-auto p-4 md:p-6">
+        <section>
+
+        </section>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section className="bg-gray-800 rounded-lg p-6 shadow-lg">
             <h2 className="text-white text-xl font-semibold mb-4">Find Campaign</h2>
@@ -198,38 +205,8 @@ export default function Home() {
               </button>
             </div>
           </section>
-        </div>
-        <section>
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 ">
-               <div className="bg-white rounded-lg p-6">
-                <div className=" justify-center items-center flex mb-6">
-                <h2 className="text-2xl">Campaign #1</h2>
-                </div>
-             <div className="justify-center flex mb-4">
-              <span className="font-bold text-gray-600 text-2xl">Goal </span>            
-                </div>
-                  <div className="flex justify-center">
-                     <span className="font-semibold">Help People in the world ! </span>
-               <CampaignList />
-                  </div>
-                  <div className="h-64 mt-10">
-                    <div className="h-64 mt-4 mb-4 bg-gray-100 rounded-lg overflow-hidden ">
-                      <img src="" alt="" className="object-cover w-full h-full" />
-                    </div>
-                  </div>
-                  <div className="flex justify-center mt-3 flex-box items-center space-x-6">
-                  <button className="bg-[#0f8922] p-3 cursor-pointer rounded-lg w-35">Contribute</button>
-                  <label htmlFor="" className="bloc w-1/4  text-white p-6 ">
-                  <select name="amount" className="w-full py-3 p-5 rounded-lg" id="" value={amount} onChange={(e) => setAmount(Number(e.target.value))}>
-                   <option value="amount">0.1 ETH</option>  
-                   <option value="amount">0.5 ETH</option>
-                   <option value="amount">1 ETH</option>  
-                  </select>  
-                  </label> 
-                  </div>
-                </div>
-           </div>
-           </section>
+        </div>  
+        
       </main>
 
       <footer className="bg-gray-800 p-4 text-center text-gray-400">

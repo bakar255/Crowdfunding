@@ -4,35 +4,33 @@ import { getContract } from "./contract";
 
 export default function CampaignList() {
     const [campaigns, setCampaigns] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchCampaigns = async () => {
+            setLoading(true);
             try {
                 const contract = await getContract();
-                const count = contract.nextOrderId(); 
+                const count = await contract.nextOrderId();
                 
-                const campaignPromises = [];
+                const campaignsData = [];
                 for (let i = 0; i < count; i++) {
-                    campaignPromises.push(contract.showCampaign(i));
-                }
-
-                const rawCampaigns = await Promise.all(campaignPromises);
-                
-                const formattedCampaigns = rawCampaigns.map((campaign, index) => ({
-                    id: index,
-                    goal: campaign.goal,
-                    creator: campaign.creator,
-                    balance: ethers.formatEther(campaign.balance),
+                    const campaign = await contract.showCampaign(i);
+                    campaignsData.push({
+                     id: i,
+                     goal: campaign.goal,
+                     creator: campaign.creator,
+                     balance: ethers.formatEther(campaign.balance),
+                    
                     isActive: campaign.isActive,
-                    deadline: new Date(Number(campaign.deadlineDuration) * 1000),
-                    formattedBalance: ethers.formatEther(campaign.balance)
-                }));
-
-                setCampaigns(formattedCampaigns);
+                        deadline: campaign.deadlineDuration
+                    });
+                }
+                
+                setCampaigns(campaignsData);
             } catch (err) {
-                console.error("Failed to fetch campaigns:", err);
+                console.error("Fetch error:", err);
                 setError("Failed to load campaigns");
             } finally {
                 setLoading(false);
@@ -42,12 +40,24 @@ export default function CampaignList() {
         fetchCampaigns();
     }, []);
 
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+
     return (
-        <div className="max-w-4xl mx-auto py-8">
-            <h2 className="text-2xl font-bold text-white mb-6">All Campaigns</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {campaigns.map((campaign) => (
+        <div>
+            <h2>All Campaigns</h2>
+            <div>
+                {campaigns.map(campaign => (
+                    <div key={campaign.id} className="flex-shrink-0 mx-4">
+                            <div className="rounded-lg bg-gray-400 h-90 min-w-[1px]">
+                            <h3>{campaign.goal}</h3>
+                            <p>ID: {campaign.id}</p>
+                            <p>Balance: {campaign.balance} ETH</p>
+                            <p>Creator: {campaign.creator}</p>
+                            <p>Status: {campaign.isActive ? "Active" : "Ended"}</p>
+                            <p>Balance: {campaign.balance} ETH</p>
+                        </div>
+                  </div>
                 ))}
             </div>
         </div>

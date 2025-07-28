@@ -21,3 +21,18 @@ body {
   background-color: #1a1717;
 }
 
+.button-navbar {
+  border-radius: 0.60rem;
+  text-align: center;
+  background-color: #011356;
+  color: #ffffff;
+  padding: 10px;
+  transition: all ease 0.3s;
+  cursor: pointer;
+}
+
+.button-navbar:hover {
+   transform: translateY(-4px);
+
+}
+
