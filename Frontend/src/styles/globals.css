@@ -22,17 +22,17 @@ body {
 }
 
 .button-navbar {
-  border-radius: 0.60rem;
+  border-radius: 0.40rem;
   text-align: center;
-  background-color: #011356;
-  color: #ffffff;
-  padding: 10px;
+  background-color: #f4f4f4;
+  color: #0f0f0f;
+  padding: 0.3rem 1.3rem;
   transition: all ease 0.3s;
   cursor: pointer;
 }
 
 .button-navbar:hover {
-   transform: translateY(-4px);
+   transform: translateY(-1px);
 
 }
 

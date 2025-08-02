@@ -5,6 +5,9 @@ import { getContract } from "@/utils/contract";
 import { createCampaign, getCampaignById, contribute } from '@utils/CampaignAction';
 import { ethers } from "ethers";
 import  CampaignList  from "@utils/Campaign";
+import { FaHandHoldingDroplet } from "react-icons/fa6";
+import Hero from "./components/Hero";
+
 
 interface Campaign {
   id: bigint | string;
@@ -81,138 +84,29 @@ export default function Home() {
 };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900">
-      <header className="bg-gray-800 w-full p-4 shadow-md">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-white text-xl font-bold">Crowdfunding Platform</h1>
-          <div className="space-x-7">
-          <button className="button-navbar ">DashBoard</button>
-          <button className="button-navbar">Campaigns</button>
-          </div>
+
+    <div className="min-h-screen bg-blend-color bg-[#cacaca]">
+      <nav className="sticky w-full flex inset-0 z-50 bg-white navbar-expand-lg shadow-md min-h-13 items-center p-6 mx-auto">
+        <FaHandHoldingDroplet  className="bg-amber-500 rounded-lg w-10 h-10 p-1"/>
+        <span className="text-black font-bold ml-2 ">Crowdfuding platform</span>
+          <div className="text-black flex justify-between flex-1">
+           <ul className=" flex space-x-14 mt-1.5 ml-79">
+            <a href="" className="text-gray-500 transition-all ease-in duration-400 hover:text-amber-500">Community</a>
+            <a href=""  className="text-gray-500 hover:text-amber-500 transition-all ease-in duration-400">Donation</a>
+            <a href=""  className="text-gray-500 hover:text-amber-500 transition-all ease-in duration-400">Crisis</a>
+           </ul>
+           <button className="rounded-full p-5 text-black py-1 shadow-lg font-bold cursor-pointer hover:text-amber-500 transition-all ease-in duration-400">Start a Fundraising</button>
         </div>
-      </header>
+      </nav>
+    <main>
+     <Hero />
+    </main>
+
+    <footer>
       
-      <main className="flex-grow container mx-auto p-4 md:p-6">
-        <section>
-
-        </section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <section className="bg-gray-800 rounded-lg p-6 shadow-lg">
-            <h2 className="text-white text-xl font-semibold mb-4">Find Campaign</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="campaign-id" className="block text-gray-300 mb-2">
-                  Campaign ID:
-                </label>
-                <input
-                  id="campaign-id"
-                  type="text"
-                  value={campaignId}
-                  onChange={(e) => setCampaignId(e.target.value)}
-                  placeholder="Enter campaign ID"
-                  className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`w-full py-2 px-4 rounded font-medium ${isLoading 
-                  ? 'bg-gray-600 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700'}`}
-              >
-                {isLoading ? "Loading..." : "View Campaign"}
-              </button>
-            </form>
-
-            {error && (
-              <div className="mt-4 p-2 bg-red-900 text-red-200 rounded">
-                {error}
-              </div>
-            )}
-
-            {campaign && (
-                <div className="border rounded-lg p-4 bg-white shadow mt-10">
-          <h3 className="text-xl font-bold mb-3">Campaign Details</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="font-semibold">ID:</p>
-              <p>{campaign.id.toString()}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Creator:</p>
-              <p className="truncate">{campaign.creator}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Goal:</p>
-              <p>{campaign.goal} ETH</p>
-            </div>
-            <div>
-              <p className="font-semibold">Duration:</p>
-              <p>{Number(campaign.duration)} seconds</p>
-            </div>
-            <div>
-              <p className="font-semibold">Balance:</p>
-              <p>{campaign.balance} ETH</p>
-            </div>
-            <div>
-              <p className="font-semibold">Status:</p>
-              <p>{campaign.isActive ? 'Active 🟢' : 'Ended 🔴'}</p>
-            </div>
-            <div className="col-span-2">
-              <p className="font-semibold">Deadline:</p>
-              <p>{campaign.deadline.toLocaleString()}</p>
-            </div>
-          </div>
-        </div>
-      )}
-          </section>
-
-          <section className="bg-gray-800 rounded-lg p-6 shadow-lg">
-            <h2 className="text-white text-xl font-semibold mb-4">Create New Campaign</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-gray-300 mb-2">Funding Goal (ETH)</label>
-                <input 
-                  type="text" 
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)} 
-                  placeholder="Enter funding goal"
-                  className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-300 mb-2">Duration (days)</label>
-                <select 
-                  value={days}
-                  onChange={(e) => setDays(Number(e.target.value))} 
-                  className="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
-                >
-                  {[1, 2, 3].map(day => (
-                    <option key={day} value={day}>{day} day{day > 1 ? 's' : ''}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <button
-                onClick={handleCreateCampaign}
-                disabled={isLoading}
-                className={`w-full py-2 px-4 rounded font-medium ${isLoading 
-                  ? 'bg-gray-600 cursor-not-allowed' 
-                  : 'bg-green-600 hover:bg-green-700'}`}
-              >
-                {isLoading ? "Creating..." : "Create Campaign"}
-              </button>
-            </div>
-          </section>
-        </div>  
-        
-      </main>
-
-      <footer className="bg-gray-800 p-4 text-center text-gray-400">
-        <p>Crowdfunding Platform</p>
-      </footer>
+    </footer>
     </div>
+    
   );
 }
 
